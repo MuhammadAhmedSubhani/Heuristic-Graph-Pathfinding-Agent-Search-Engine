@@ -1,0 +1,31 @@
+==============================
+Maze 4 - Larger 10x10 Grid
+==============================
+
+===== DIJKSTRA SEARCH =====
+Path length: 18
+
+S * * * * # E E E E 
+E # # # * # E # # E 
+E E E # * * * # E E 
+E # E # # # * # E # 
+E # E E E E * # E E 
+E # # # # # * # # E 
+E E E E E E * * * * 
+E # # # # # # # # * 
+E E E E E E E E E * 
+E # # # # # # # E G 
+
+===== A* SEARCH =====
+Path length: 18
+
+S * * * * # . . . . 
+E # # # * # . # # . 
+E E E # * * * # . . 
+E # E # # # * # . # 
+E # E E E E * # . . 
+E # # # # # * # # . 
+E E E E E E * * * * 
+E # # # # # # # # * 
+E E E E E E E E E * 
+E # # # # # # # E G 
