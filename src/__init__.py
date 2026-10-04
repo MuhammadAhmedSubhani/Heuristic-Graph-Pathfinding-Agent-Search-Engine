@@ -1,0 +1,1 @@
+"""Source package for the maze pathfinding benchmark."""

@@ -10,10 +10,15 @@
 # dijkstra() - Implementation of Dijkstra's algorithm
 # a_star() - Implementation of the A* algorithm
 # Benchmark() - Runs both algorithms on all mazes and prints results
-# Maze - Added NOW
+# Maze - Contains the maze grid, start and goal positions
 
 import heapq
 import time
+import csv
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+RESULTS_DIR = PROJECT_ROOT / "results"
 
 grid = [
     [0, 0, 0, 1, 0],   # 0 = walkable 
@@ -325,6 +330,11 @@ def benchmark():
 
     global grid, start, goal
 
+    print("\n\n========== BENCHMARK RESULTS ==========")
+
+    # Store results for the final table
+    results = []
+
     for maze_number, maze in enumerate(mazes, start=1):
 
         # Load the current maze
@@ -348,6 +358,10 @@ def benchmark():
 
         dijkstra_path = reconstruct_path(parents_dijkstra)
 
+        dijkstra_density = expanded_node_density(
+            len(expanded_dijkstra)
+        )
+
         # -------------------------
         # Run A*
         # -------------------------
@@ -360,14 +374,6 @@ def benchmark():
 
         a_star_path = reconstruct_path(parents_a_star)
 
-        # -------------------------
-        # Calculate densities
-        # -------------------------
-
-        dijkstra_density = expanded_node_density(
-            len(expanded_dijkstra)
-        )
-
         a_star_density = expanded_node_density(
             len(expanded_a_star)
         )
@@ -379,8 +385,10 @@ def benchmark():
         print("\nDijkstra:")
 
         if dijkstra_path:
-            print("Path length:", len(dijkstra_path) - 1)
+            dijkstra_steps = len(dijkstra_path) - 1
+            print("Path length:", dijkstra_steps)
         else:
+            dijkstra_steps = None
             print("No path found.")
 
         print("Expanded nodes:", len(expanded_dijkstra))
@@ -398,8 +406,10 @@ def benchmark():
         print("\nA*:")
 
         if a_star_path:
-            print("Path length:", len(a_star_path) - 1)
+            a_star_steps = len(a_star_path) - 1
+            print("Path length:", a_star_steps)
         else:
+            a_star_steps = None
             print("No path found.")
 
         print("Expanded nodes:", len(expanded_a_star))
@@ -410,6 +420,114 @@ def benchmark():
             "%"
         )
 
+        # -------------------------
+        # Save results
+        # -------------------------
+
+        results.append({
+            "maze": maze["name"],
+            "dijkstra_steps": dijkstra_steps,
+            "a_star_steps": a_star_steps,
+            "dijkstra_expanded": len(expanded_dijkstra),
+            "a_star_expanded": len(expanded_a_star),
+            "dijkstra_density": dijkstra_density,
+            "a_star_density": a_star_density,
+            "dijkstra_time": dijkstra_time,
+            "a_star_time": a_star_time
+        })
+
+    # =================================
+    # FINAL COMPARISON TABLE
+    # =================================
+
+    print("\n\n==============================================================")
+    print("                 ALGORITHM COMPARISON")
+    print("==============================================================")
+
+    print(
+    f"{'Maze':<25}"
+    f"{'Dijkstra Steps':<16}"
+    f"{'A* Steps':<12}"
+    f"{'Dijkstra Nodes':<16}"
+    f"{'A* Nodes':<12}"
+    f"{'Reduction':<12}"
+    )
+
+    print("-" * 81)
+
+    for result in results:
+
+        dijkstra_steps = (
+            str(result["dijkstra_steps"])
+            if result["dijkstra_steps"] is not None
+            else "No path"
+        )
+
+        a_star_steps = (
+            str(result["a_star_steps"])
+            if result["a_star_steps"] is not None
+            else "No path"
+        )
+
+        # Calculate A* node reduction
+        if result["dijkstra_expanded"] > 0:
+            reduction = ( (result["dijkstra_expanded"] - result["a_star_expanded"]) / result["dijkstra_expanded"] ) * 100
+        else:
+            reduction = 0
+
+        print(
+            f"{result['maze']:<25}"
+            f"{dijkstra_steps:<16}"
+            f"{a_star_steps:<12}"
+            f"{result['dijkstra_expanded']:<16}"
+            f"{result['a_star_expanded']:<12}"
+            f"{reduction:.2f}%"
+        )
+
+    # Save benchmark results to CSV
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    results_file = RESULTS_DIR / "benchmark_results.csv"
+    with results_file.open("w", newline="") as file:
+        writer = csv.writer(file)
+
+        writer.writerow([
+            "Maze",
+            "Dijkstra Path",
+            "A* Path",
+            "Dijkstra Expanded",
+            "A* Expanded",
+            "Dijkstra Density (%)",
+            "A* Density (%)",
+            "Dijkstra Runtime (s)",
+            "A* Runtime (s)",
+            "A* Node Reduction (%)"
+        ])
+
+        for result in results:
+
+            # Calculate A* node reduction
+            if result["dijkstra_expanded"] > 0:
+                reduction = ( (result["dijkstra_expanded"] - result["a_star_expanded"]) / result["dijkstra_expanded"] ) * 100
+            else:
+                reduction = 0
+
+            writer.writerow([
+                result["maze"],
+                result["dijkstra_steps"],
+                result["a_star_steps"],
+                result["dijkstra_expanded"],
+                result["a_star_expanded"],
+                f"{result['dijkstra_density']:.2f}",
+                f"{result['a_star_density']:.2f}",
+                f"{result['dijkstra_time']:.8f}",
+                f"{result['a_star_time']:.8f}",
+                f"{reduction:.2f}"
+            ])
+
+    print(f"\nBenchmark results saved: {results_file.name}")
+    
+    print("==============================================================")
+    
 def visualize_maze(maze_index):
 
     global grid, start, goal
@@ -475,7 +593,8 @@ def save_visualization(maze_index):
     start = maze["start"]
     goal = maze["goal"]
 
-    filename = f"maze_{maze_index + 1}_visualization.txt"
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    filename = RESULTS_DIR / f"maze_{maze_index + 1}_visualization.txt"
 
     with open(filename, "w") as file:
 
@@ -577,8 +696,13 @@ def save_visualization(maze_index):
 
             file.write(row_output + "\n")
 
-    print(f"\nVisualization saved: {filename}")    
+    print(f"\nVisualization saved: {filename.name}")
 
-benchmark()
-visualize_maze(3)
-save_visualization(3)
+def main():
+    benchmark()
+    visualize_maze(3)
+    save_visualization(3)
+
+
+if __name__ == "__main__":
+    main()
