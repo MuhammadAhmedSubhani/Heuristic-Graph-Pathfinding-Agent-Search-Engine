@@ -440,12 +440,12 @@ def benchmark():
     # FINAL COMPARISON TABLE
     # =================================
 
-    print("\n\n==============================================================")
-    print("                 ALGORITHM COMPARISON")
-    print("==============================================================")
+    print("\n\n========================================================================")
+    print("                         ALGORITHM COMPARISON")
+    print("========================================================================")
 
     print(
-    f"{'Maze':<25}"
+    f"{'Maze':<32}"
     f"{'Dijkstra Steps':<16}"
     f"{'A* Steps':<12}"
     f"{'Dijkstra Nodes':<16}"
@@ -453,7 +453,7 @@ def benchmark():
     f"{'Reduction':<12}"
     )
 
-    print("-" * 81)
+    print("-" * 88)
 
     for result in results:
 
@@ -476,7 +476,7 @@ def benchmark():
             reduction = 0
 
         print(
-            f"{result['maze']:<25}"
+            f"{result['maze']:<32}"
             f"{dijkstra_steps:<16}"
             f"{a_star_steps:<12}"
             f"{result['dijkstra_expanded']:<16}"
