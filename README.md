@@ -1,11 +1,4 @@
-﻿# Heuristic Graph Pathfinding Agent
-
-A lightweight Python project that compares Dijkstra's algorithm and A* on a set of grid mazes, highlighting path cost, explored nodes, efficiency, and runtime behavior.
-
-<p align="center">
-  <img src="https://img.shields.io/badge/Python-3.8%2B-3776AB?style=for-the-badge&logo=python" alt="Python 3.8+" />
-  <img src="https://img.shields.io/badge/Algorithms-Dijkstra%20%2B%20A*-%234B8BBE?style=for-the-badge" alt="Algorithms" />
-</p>
+﻿# Heuristic Graph Pathfinding Agent Search Engine
 
 ## Live Preview
 
@@ -13,39 +6,63 @@ Try the app in the browser here:
 
 [Heuristic Graph Pathfinding Agent Live Preview](https://heuristic-graph-pathfinding-agent-search.onrender.com)
 
-## Why this project?
+##
 
-This project is designed to make pathfinding behavior easy to compare visually and numerically. It evaluates how each algorithm:
+A Python-based pathfinding project that compares **A\* Search** and **Dijkstra's algorithm** across grid mazes. It measures path lengths, expanded nodes, node-expansion density, and runtime, and exports benchmark results and a text visualization.
 
-- finds the shortest valid route,
-- expands different numbers of nodes,
-- trades off speed and efficiency,
-- handles unreachable goals and obstacle-heavy maps.
+## Project Objectives
 
-## Highlights
+- Implement A\* Search and Dijkstra's algorithm from scratch.
+- Find shortest paths through grid mazes while avoiding obstacles.
+- Compare algorithm behavior across different maze layouts.
+- Record metrics including path length, expanded nodes, expansion density, and runtime.
+- Export benchmark results and a maze visualization log.
+- Test reachable and unreachable goal scenarios.
 
-- Six mazes, including a 10x10 grid and an intentionally unsolvable goal.
-- Four-direction movement with unit cost per step.
-- A* uses Manhattan distance as an admissible heuristic for this movement model.
-- Side-by-side performance benchmark output and CSV-based result tracking.
-- Maze visualization saved as plain-text output for easy inspection.
-- No third-party Python dependencies required.
+## Algorithms
 
-## Quick Start
+### Dijkstra's Algorithm
 
-Requires Python 3.8 or newer.
+Dijkstra's algorithm explores the frontier node with the lowest known cost from the start. With non-negative edge costs, it finds a shortest path when a route exists.
 
-```bash
-python app.py
-```
+### A\* Search
 
-This runs both algorithms across all mazes, prints a comparison summary, and updates the generated files in `results/`. It also displays and saves the search visualization for Maze 4.
+A\* prioritizes nodes using:
 
-Run the tests with:
+`f(n) = g(n) + h(n)`
 
-```bash
-python -m unittest discover -s tests -v
-```
+Where:
+- `g(n)` is the cost from the start to node `n`.
+- `h(n)` is the estimated cost from node `n` to the goal.
+
+This project uses **Manhattan distance** for four-directional grid movement:
+
+`h(n) = |x_goal - x_n| + |y_goal - y_n|`
+
+Movement is limited to up, down, left, and right, with a cost of `1` per move.
+
+## Benchmark Results
+
+The project evaluates six maze layouts, including five reachable mazes and one maze with no valid route.
+
+| Maze | Shortest Path Length | Dijkstra Expanded Nodes | A\* Expanded Nodes | A\* Node Reduction |
+|---|---:|---:|---:|---:|
+| Maze 1 — Simple | 8 | 19 | 17 | 10.53% |
+| Maze 2 — More Obstacles | 8 | 19 | 19 | 0.00% |
+| Maze 3 — Dense Obstacles | 8 | 18 | 16 | 11.11% |
+| Maze 4 — Larger 10×10 Grid | 18 | 61 | 49 | 19.67% |
+| Maze 5 — Different Layout | 8 | 15 | 11 | 26.67% |
+| Maze 6 — No Path | No path | 11 | 11 | 0.00% |
+
+### Key Findings
+
+- A\* and Dijkstra found equal-length shortest paths in all five reachable mazes.
+- A\* expanded fewer nodes in four of the six test cases.
+- The largest reduction in expanded nodes was **26.67%** in Maze 5.
+- In the larger 10×10 Maze 4, A\* expanded 49 nodes compared with 61 for Dijkstra.
+- Both algorithms correctly identified the unreachable goal in Maze 6.
+
+Runtime measurements are included in the CSV output. Since the searches are very small, runtime can vary with machine load and measurement overhead; treat it as illustrative rather than a stable performance claim.
 
 ## Project Structure
 
@@ -54,55 +71,124 @@ Heuristic-Graph-Pathfinding-Agent-Search-Engine/
 ├── app.py
 ├── src/
 │   ├── __init__.py
-│   ├── project.py
+│   └── project.py
 ├── tests/
-│   ├── test_pathfinding.py
+│   └── test_pathfinding.py
 ├── results/
 │   ├── benchmark_results.csv
-│   ├── maze_4_visualization.txt
+│   └── maze_4_visualization.txt
 ├── reports/
-│   ├── benchmark_summary.md
-│   ├── Task 3 Final Report.pdf  
+│   └── benchmark_summary.md
 ├── README.md
 ├── LICENSE
 └── .gitignore
 ```
 
-## Algorithm Comparison
+## Requirements
 
-| Algorithm | Priority Function | Notes |
-| --- | --- | --- |
-| Dijkstra | `g(n)` | Expands nodes by accumulated path cost from the start. |
-| A* | `g(n) + h(n)` | Uses Manhattan distance `h(n)` to head toward the goal efficiently. |
+- Python 3
+- No external third-party package is required for the core algorithms if the project uses only Python standard-library modules.
 
-Both algorithms return shortest paths for the project's unweighted, four-way mazes. A maze with no valid route is reported as `No path`.
+The code uses Python modules such as `heapq` for priority queues and `time.perf_counter` for runtime measurement. The automated tests use `unittest`.
 
-## Sample Results
+## Setup and Run
 
-A representative sample run found an 18-step route through Maze 4 with both algorithms.
+### 1. Clone the repository
 
-- Dijkstra expanded 61 nodes.
-- A* expanded 49 nodes.
-- A* achieved a ~19.67% reduction in explored nodes for that maze.
+```bash
+git clone https://github.com/MuhammadAhmedSubhani/Heuristic-Graph-Pathfinding-Agent-Search-Engine.git
+cd Heuristic-Graph-Pathfinding-Agent-Search-Engine
+```
 
-Runtime varies by machine and execution conditions, so the CSV file remains the authoritative record of the latest metrics.
+### 2. Run the project
 
-Maze 6 is intentionally unsolvable, and both algorithms correctly report no path.
-More detailed information is available in [reports/benchmark_summary.md](reports/benchmark_summary.md).
+If Python is available on your system:
 
-## Visualization Legend
+```bash
+python app.py
+```
 
-| Symbol | Meaning |
-| --- | --- |
-| `S` | Start |
-| `G` | Goal |
-| `#` | Obstacle |
-| `*` | Selected shortest path |
-| `E` | Expanded search node |
-| `.` | Unvisited walkable cell |
+On Windows, if the `python` command is not available, activate or use the Python environment configured on your machine. For example, from the repository folder, if the environment is in the parent folder:
 
-The maze visualization prioritizes the final shortest path, while expanded nodes are marked separately to keep the search pattern readable.
+```powershell
+& "..\.venv\Scripts\python.exe" app.py
+```
+
+The application runs the benchmark and generates or updates the project output files according to the implementation in `app.py`.
+
+## Run Automated Tests
+
+Run the test suite from the repository root:
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+If using the virtual environment located in the parent folder on Windows:
+
+```powershell
+& "..\.venv\Scripts\python.exe" -m unittest discover -s tests -v
+```
+
+### Verified Test Results
+
+The latest test run reported **3 tests passed**:
+
+- `test_a_star_finds_a_valid_shortest_path`
+- `test_a_star_matches_dijkstra_on_reachable_mazes`
+- `test_both_algorithms_report_unreachable_goal`
+
+## Output Files
+
+| File | Description |
+|---|---|
+| `results/benchmark_results.csv` | Benchmark metrics for the six maze cases, including paths, expanded nodes, expansion density, runtime, and node reduction. |
+| `results/maze_4_visualization.txt` | Text-based search visualization for Maze 4. |
+| `reports/benchmark_summary.md` | Summary of benchmark methodology, results, and key findings. |
+
+## Metrics
+
+### Expanded-Node Reduction
+
+The relative reduction in expanded nodes is calculated against Dijkstra's expanded-node count:
+
+```text
+((Dijkstra expanded nodes - A* expanded nodes) / Dijkstra expanded nodes) * 100
+```
+
+### Path Length
+
+Path length is the number of moves in the returned route. Since each move has a cost of `1`, the path length is also the total route cost.
+
+### Expansion Density and Runtime
+
+Expansion density and runtime are recorded by the project in the benchmark CSV. Runtime is sensitive to system load and measurement noise, especially for small mazes.
+
+## Limitations and Future Improvements
+
+- The experiments use six fixed maze layouts; more randomized and larger mazes could provide broader evaluation.
+- The current movement model supports four directions and uniform movement costs.
+- Runtime comparisons could be strengthened by running repeated trials and reporting averages and variation.
+- Future versions could include weighted terrain, configurable start/goal positions, and richer visualizations.
+
+## Technologies Used
+
+- **Language:** Python
+- **Search algorithms:** A\* Search, Dijkstra's algorithm
+- **Priority queue:** `heapq`
+- **Runtime measurement:** `time.perf_counter`
+- **Testing:** `unittest`
+- **Output formats:** CSV and text
+- **Version control:** Git and GitHub
+
+## Author
+
+**Muhammad Ahmed Subhani**
+
+## Repository
+
+[GitHub Repository](https://github.com/MuhammadAhmedSubhani/Heuristic-Graph-Pathfinding-Agent-Search-Engine)
 
 ## License
 
-This project is distributed under the terms of the included [LICENSE](LICENSE).
+See the [`LICENSE`](LICENSE) file for license details.
