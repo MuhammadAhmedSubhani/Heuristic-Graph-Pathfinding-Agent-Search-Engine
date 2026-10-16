@@ -62,6 +62,7 @@ Heuristic-Graph-Pathfinding-Agent-Search-Engine/
 │   ├── maze_4_visualization.txt
 ├── reports/
 │   ├── benchmark_summary.md
+│   ├── Task 3 Final Report.pdf  
 ├── README.md
 ├── LICENSE
 └── .gitignore
